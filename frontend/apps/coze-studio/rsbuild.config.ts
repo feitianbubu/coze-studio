@@ -91,7 +91,9 @@ const mergedConfig = defineConfig({
   source: {
     define: {
       'process.env.IS_REACT18': JSON.stringify(true),
-      // Arcosite editor sdk internal use
+      'process.env.ENABLE_OAUTH': JSON.stringify(process.env.ENABLE_OAUTH || 'true'),
+      'process.env.OAUTH_REDIRECT_URL': JSON.stringify(process.env.OAUTH_REDIRECT_URL || ''),
+      // Arcosite editor sdk internal use// Arcosite editor sdk internal use
       'process.env.ARCOSITE_SDK_REGION': JSON.stringify(
         GLOBAL_ENVS.IS_OVERSEA ? 'VA' : 'CN',
       ),

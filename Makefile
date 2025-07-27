@@ -31,6 +31,10 @@ fe:
 	@echo "Building frontend..."
 	@bash $(BUILD_FE_SCRIPT)
 
+stop:
+	@lsof -ti :8888 | xargs kill -9 2>/dev/null || true
+	@lsof -ti :8889 | xargs kill -9 2>/dev/null || true
+
 server: env
 	@if [ ! -d "$(STATIC_DIR)" ]; then \
 		echo "Static directory '$(STATIC_DIR)' not found, building frontend..."; \
@@ -59,6 +63,7 @@ sql_init:
 
 middleware:
 	@echo "Start middleware docker environment for opencoze app"
+	#@docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) --profile middleware down -v
 	@docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) --profile middleware up -d --wait
 
 build_docker:

@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-package entity
+package ctxutil
 
 import (
-	"time"
+	"context"
+	"errors"
+
+	"github.com/coze-dev/coze-studio/backend/pkg/ctxcache"
 )
 
-const SessionKey = "session"
+func getUserLLMAPIKey(ctx context.Context) (string, error) {
+	if accessToken, ok := ctxcache.Get[string](ctx, "clinx_access_token"); ok && accessToken != "" {
+		return accessToken, nil
+	}
 
-type Session struct {
-	UserID int64
-	Locale string
+	return "", errors.New("user access key not available - using configured key as fallback")
+}
 
-	CreatedAt time.Time
-	ExpiresAt time.Time
+func TryGetUserAPIKey(ctx context.Context, originalAPIKey string) string {
+	if userAPIKey, err := getUserLLMAPIKey(ctx); err == nil && userAPIKey != "" {
+		return userAPIKey
+	}
+	return originalAPIKey
 }

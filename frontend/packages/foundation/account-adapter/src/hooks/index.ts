@@ -25,14 +25,12 @@ const useGoLogin = (loginFallbackPath?: string) => {
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
   return () => {
-    const redirectPath = `${pathname}${search}`;
-    if (loginFallbackPath) {
-      navigate(`${loginFallbackPath}${search}`, { replace: true });
-    } else {
-      navigate(
-        `${signPath}?${signRedirectKey}=${encodeURIComponent(redirectPath)}`,
-      );
-    }
+    // 构建OAuth重定向URL，redirect_uri指向clinx的OAuth端点，实际回调会由后端处理
+    const callbackURL = encodeURIComponent(window.location.origin + '/oauth/callback');
+    
+    const redirectURL = (typeof import.meta !== 'undefined' && import.meta.env?.OAUTH_REDIRECT_URL) || 
+      `https://uc-component.101.com/?re_login=true&redirect_type=window&send_uckey=true&redirect_uri=${callbackURL}&sdp-app-id=2f8492db-41c2-4ed3-bd09-78832ca95f37&lang=zh-CN#/login`;
+    window.location.href = redirectURL;
   };
 };
 

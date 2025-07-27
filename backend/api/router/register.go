@@ -28,6 +28,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app/server"
 
 	coze "github.com/coze-dev/coze-studio/backend/api/router/coze"
+	cozeHandler "github.com/coze-dev/coze-studio/backend/api/handler/coze"
 	"github.com/coze-dev/coze-studio/backend/pkg/logs"
 )
 
@@ -35,7 +36,30 @@ import (
 func GeneratedRegister(r *server.Hertz) {
 	// INSERT_POINT: DO NOT DELETE THIS LINE!
 	coze.Register(r)
+	oauthRegister(r)
 	staticFileRegister(r)
+}
+
+// oauthRegister registers OAuth related routes manually
+func oauthRegister(r *server.Hertz) {
+	// OAuth callback route
+	r.GET("/oauth/callback", cozeHandler.OAuthCallback)
+	
+	// OAuth enhanced passport API
+	apiGroup := r.Group("/api")
+	{
+		passportGroup := apiGroup.Group("/passport")
+		{
+			accountGroup := passportGroup.Group("/account")
+			{
+				infoGroup := accountGroup.Group("/info")
+				{
+					v2Group := infoGroup.Group("/v2")
+					v2Group.POST("/oauth", cozeHandler.PassportAccountInfoV2WithOAuth)
+				}
+			}
+		}
+	}
 }
 
 // staticFileRegister registers web page router.

@@ -20,8 +20,11 @@ package coze
 
 import (
 	"context"
+	"fmt"
+	"github.com/go-resty/resty/v2"
 	"io"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/cloudwego/hertz/pkg/app"
@@ -81,8 +84,34 @@ func PassportWebLogoutGet(ctx context.Context, c *app.RequestContext) {
 		internalServerErrorResponse(ctx, c, err)
 		return
 	}
+	if err = ndLogout(ctx, c); err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	c.JSON(http.StatusOK, resp)
+}
+
+func ndLogout(_ context.Context, c *app.RequestContext) (err error) {
+	accessToken := c.Cookie("nd_access_token")
+	sdpAppId := os.Getenv("SDP_APP_ID")
+	ucSdkUri := os.Getenv("TOKEN_ENDPOINT")
+	client := resty.New()
+	requestURL := fmt.Sprintf("%s/tokens/%s", ucSdkUri, accessToken)
+	resp, err := client.R().
+		SetHeader("Accept", "application/json").
+		SetHeader("Content-Type", "application/json").
+		SetHeader("sdp-app-id", sdpAppId).
+		Delete(requestURL)
+	if err != nil {
+		err = fmt.Errorf("request nd logout failed: %v, requestURL: %s", err, requestURL)
+		return
+	}
+	if resp.IsError() {
+		err = fmt.Errorf("request nd logout failed with status code: %d, body: %s", resp.StatusCode(), resp.String())
+		return
+	}
+	return
 }
 
 // PassportWebEmailLoginPost .

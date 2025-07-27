@@ -27,11 +27,21 @@ import (
 
 	"github.com/coze-dev/coze-studio/backend/infra/contract/chatmodel"
 	"github.com/coze-dev/coze-studio/backend/infra/contract/modelmgr"
+	"github.com/coze-dev/coze-studio/backend/infra/impl/modelmgr/online"
 	"github.com/coze-dev/coze-studio/backend/infra/impl/modelmgr/static"
 	"github.com/coze-dev/coze-studio/backend/pkg/logs"
 )
 
 func initModelMgr() (modelmgr.Manager, error) {
+	// Check if ENABLE_OAUTH is true, use online model manager
+	enableOAuth := os.Getenv("ENABLE_OAUTH")
+	if enableOAuth == "true" {
+		logs.Infof("[initModelMgr] ENABLE_OAUTH is true, using online model manager")
+		return online.NewOnlineModelMgr()
+	}
+
+	// Use static model manager as default
+	logs.Infof("[initModelMgr] Using static model manager")
 	wd, err := os.Getwd()
 	if err != nil {
 		return nil, err

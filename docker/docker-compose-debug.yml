@@ -321,7 +321,7 @@ services:
     profiles: ['middleware']
     env_file: *env_file
     ports:
-      - '9000:9000'
+      - '9002:9000'
       - '9001:9001'
     volumes:
       - ./data/minio:/data

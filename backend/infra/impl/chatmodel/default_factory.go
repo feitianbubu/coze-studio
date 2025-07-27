@@ -31,6 +31,7 @@ import (
 	"github.com/volcengine/volcengine-go-sdk/service/arkruntime/model"
 	"google.golang.org/genai"
 
+	"github.com/coze-dev/coze-studio/backend/application/base/ctxutil"
 	"github.com/coze-dev/coze-studio/backend/infra/contract/chatmodel"
 	"github.com/coze-dev/coze-studio/backend/pkg/lang/ptr"
 )
@@ -73,6 +74,9 @@ func (f *defaultFactory) CreateChatModel(ctx context.Context, protocol chatmodel
 	if !found {
 		return nil, fmt.Errorf("[CreateChatModel] protocol not support, protocol=%s", protocol)
 	}
+
+	// Override API key with user's access key if available
+	config.APIKey = ctxutil.TryGetUserAPIKey(ctx, config.APIKey)
 
 	return builder(ctx, config)
 }

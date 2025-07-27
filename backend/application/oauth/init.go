@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package entity
+package oauth
 
 import (
-	"time"
+	"github.com/coze-dev/coze-studio/backend/application/user"
+	userSvc "github.com/coze-dev/coze-studio/backend/domain/user/service"
 )
 
-const SessionKey = "session"
+// Components OAuth应用服务的依赖组件
+type Components struct {
+	UserSVC userSvc.User
+}
 
-type Session struct {
-	UserID int64
-	Locale string
+// InitApplicationSVC 初始化OAuth应用服务
+func InitApplicationSVC(components Components) {
+	OAuthApplicationSVC.Init(components.UserSVC)
+}
 
-	CreatedAt time.Time
-	ExpiresAt time.Time
+// InitWithUserApplicationService 使用用户应用服务初始化OAuth服务
+func InitWithUserApplicationService() {
+	// 直接使用现有的用户应用服务
+	OAuthApplicationSVC.Init(user.UserApplicationSVC.DomainSVC)
 }

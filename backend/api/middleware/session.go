@@ -18,6 +18,7 @@ package middleware
 
 import (
 	"context"
+	"os"
 
 	"github.com/cloudwego/hertz/pkg/app"
 
@@ -34,7 +35,14 @@ import (
 
 var noNeedSessionCheckPath = map[string]bool{
 	"/api/passport/web/email/login/":       true,
+	"/oauth/callback":                      true,
 	"/api/passport/web/email/register/v2/": true,
+}
+
+// getOAuthRedirectURL 获取OAuth重定向URL
+func getOAuthRedirectURL() string {
+	redirectURL := os.Getenv("OAUTH_REDIRECT_URL")
+	return redirectURL
 }
 
 func SessionAuthMW() app.HandlerFunc {
@@ -52,6 +60,14 @@ func SessionAuthMW() app.HandlerFunc {
 
 		s := ctx.Cookie(entity.SessionKey)
 		if len(s) == 0 {
+			// 检查是否是登录页面，如果是则重定向到OAuth登录页
+			path := string(ctx.GetRequest().URI().Path())
+			if path == "/sign" || path == "/space" {
+				redirectURL := getOAuthRedirectURL()
+				ctx.Redirect(302, []byte(redirectURL))
+				return
+			}
+
 			logs.Errorf("[SessionAuthMW] session id is nil")
 			httputil.InternalError(c, ctx,
 				errorx.New(errno.ErrUserAuthenticationFailed, errorx.KV("reason", "missing session_key in cookie")))
@@ -68,6 +84,12 @@ func SessionAuthMW() app.HandlerFunc {
 
 		if session != nil {
 			ctxcache.Store(c, consts.SessionDataKeyInCtx, session)
+		}
+
+		// Check for clinx access token in cookie and store in context for LLM API calls
+		accessToken := ctx.Cookie("clinx_access_token")
+		if len(accessToken) > 0 {
+			ctxcache.Store(c, "clinx_access_token", string(accessToken))
 		}
 
 		ctx.Next(c)

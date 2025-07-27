@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package entity
+package oauth
 
 import (
-	"time"
+	"context"
+	"net/http"
 )
 
-const SessionKey = "session"
+const requestContextKey = "oauth.http_request"
 
-type Session struct {
-	UserID int64
-	Locale string
+// SetRequestToCtx 将HTTP请求添加到上下文
+func SetRequestToCtx(ctx context.Context, req *http.Request) context.Context {
+	return context.WithValue(ctx, requestContextKey, req)
+}
 
-	CreatedAt time.Time
-	ExpiresAt time.Time
+// GetRequestFromCtx 从上下文获取HTTP请求
+func GetRequestFromCtx(ctx context.Context) *http.Request {
+	if req, ok := ctx.Value(requestContextKey).(*http.Request); ok {
+		return req
+	}
+	return nil
 }

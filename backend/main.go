@@ -51,6 +51,10 @@ func main() {
 
 	setLogLevel()
 
+	if err := validateRequiredEnvVars(); err != nil {
+		panic("Environment variable validation failed: " + err.Error())
+	}
+
 	if err := application.Init(ctx); err != nil {
 		panic("InitializeInfra failed, err=" + err.Error())
 	}
@@ -153,4 +157,26 @@ func setLogLevel() {
 func setCrashOutput() {
 	crashFile, _ := os.Create("crash.log")
 	debug.SetCrashOutput(crashFile, debug.CrashOptions{})
+}
+
+func validateRequiredEnvVars() error {
+	requiredVars := []string{
+		"CLINX_API_BASE_URL",
+		"CLINX_AUTH_URL",
+		"SDP_APP_ID",
+		"OAUTH_CALLBACK_URL",
+	}
+
+	var missingVars []string
+	for _, varName := range requiredVars {
+		if os.Getenv(varName) == "" {
+			missingVars = append(missingVars, varName)
+		}
+	}
+
+	if len(missingVars) > 0 {
+		return fmt.Errorf("missing required environment variables: %s", strings.Join(missingVars, ", "))
+	}
+
+	return nil
 }
