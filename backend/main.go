@@ -23,6 +23,7 @@ import (
 	"crypto/tls"
 	"fmt"
 	"os"
+	"path"
 	"runtime/debug"
 	"strings"
 
@@ -107,6 +108,12 @@ func startHttpServer() {
 func loadEnv() (err error) {
 	appEnv := os.Getenv("APP_ENV")
 	fileName := ternary.IFElse(appEnv == "", ".env", ".env."+appEnv)
+
+	if fileName == ".env.debug" {
+		if _, err := os.Stat(fileName); err != nil {
+			fileName = path.Join("..", "docker", fileName)
+		}
+	}
 
 	logs.Infof("load env file: %s", fileName)
 
