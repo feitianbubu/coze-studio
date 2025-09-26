@@ -45,6 +45,11 @@ func MustGetUIDFromCtx(ctx context.Context) int64 {
 func GetUIDFromCtx(ctx context.Context) *int64 {
 	sessionData := GetUserSessionFromCtx(ctx)
 	if sessionData == nil {
+		// Session不存在，尝试API认证/JWT认证
+		apiAuth := GetApiAuthFromCtx(ctx)
+		if apiAuth != nil {
+			return &apiAuth.UserID
+		}
 		return nil
 	}
 
