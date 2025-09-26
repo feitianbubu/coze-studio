@@ -61,9 +61,11 @@ sql_init:
 	@echo "Init sql data..."
 	@docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) --profile mysql-setup up -d
 
+middleware-down:
+	@echo "down middleware docker environment for opencoze app"
+	@docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) --profile middleware down -v
 middleware:
 	@echo "Start middleware docker environment for opencoze app"
-	#@docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) --profile middleware down -v
 	@docker compose -f $(COMPOSE_FILE) --env-file $(ENV_FILE) --profile middleware up -d --wait
 
 build_docker:
