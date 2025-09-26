@@ -465,7 +465,7 @@ services:
     command: /nsqadmin --lookupd-http-address=coze-nsqlookupd:4161
     profiles: ['middleware']
     ports:
-      - '127.0.0.1:4171:4171'
+      - '4171:4171'
     depends_on:
       nsqlookupd:
         condition: service_healthy

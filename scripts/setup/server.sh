@@ -44,7 +44,7 @@ echo "🧹 Checking for sandbox availability..."
 
 echo "🧹 Checking for goimports availability..."
 
-if command -v goimports >/dev/null 2>&1; then
+if command -v _goimports >/dev/null 2>&1; then
     echo "🧹 Formatting Go files with goimports..."
     find "$BACKEND_DIR" \
         -path "$BACKEND_DIR/api/model" -prune -o \
