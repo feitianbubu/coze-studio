@@ -1542,6 +1542,11 @@ func _getonlineappdataMw() []app.HandlerFunc {
 	return nil
 }
 
+func _knowledgeretrieveMw() []app.HandlerFunc {
+	// your code...
+	return nil
+}
+
 func _search0Mw() []app.HandlerFunc {
 	// your code...
 	return nil

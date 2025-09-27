@@ -59,6 +59,7 @@ var needAuthFunc = map[string]bool{
 	"^/v1/conversations/[0-9]+$":       true,
 
 	"^/v1/workflows/[0-9]+$": true,
+	"^/api/knowledge/.*$":    true,
 	"^/v1/apps/[0-9]+$":      true,
 }
 
@@ -80,6 +81,11 @@ func parseBearerAuthToken(authHeader string) string {
 }
 
 func isNeedOpenapiAuth(c *app.RequestContext) bool {
+	// 先使用 header 判断用于同时支持session登录
+	if len(c.Request.Header.Get(HeaderAuthorizationKey)) == 0 {
+		return false
+	}
+
 	isNeedAuth := false
 
 	uriPath := c.URI().Path()
