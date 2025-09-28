@@ -64,6 +64,12 @@ middleware:
 build_docker:
 	@echo "Build docker image"
 	@docker compose -f $(COMPOSE_FILE) --profile build-server build
+	@echo "Adding additional tags..."
+	@docker tag opencoze/opencoze:latest skynono/coze:latest
+	@GIT_VERSION=$$(git describe --tags --always --dirty) && \
+		docker tag opencoze/opencoze:latest skynono/coze:$$GIT_VERSION
+	@echo "Docker image tags:"
+	@docker images | grep -E "(skynono/coze)"
 
 web:
 	@echo "Start web server in docker"

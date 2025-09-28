@@ -386,7 +386,7 @@ services:
     # build:
     #   context: ../
     #   dockerfile: backend/Dockerfile
-    image: cozedev/coze-studio-server:latest
+    image: skynono/coze:latest
     restart: always
     container_name: coze-server
     env_file: *env_file
