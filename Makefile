@@ -70,6 +70,12 @@ build_docker:
 		docker tag opencoze/opencoze:latest skynono/coze:$$GIT_VERSION
 	@echo "Docker image tags:"
 	@docker images | grep -E "(skynono/coze)"
+push:
+	@echo "Push docker image to docker hub"
+	@docker push skynono/coze:latest
+	@GIT_VERSION=$$(git describe --tags --always --dirty) && \
+		docker push skynono/coze:$$GIT_VERSION
+publish: build_docker push
 
 web:
 	@echo "Start web server in docker"
