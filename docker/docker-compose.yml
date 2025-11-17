@@ -325,6 +325,12 @@ services:
     # ports:
     #   - '19530'
     #   - '9091'
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"  # 单个日志文件最大100MB
+        max-file: "3"     # 最多保留3个日志文件（轮换）
+        compress: "true"  # 压缩旧日志文件（可选，节省空间）
     depends_on:
       etcd:
         condition: service_healthy
